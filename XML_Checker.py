@@ -1,9 +1,7 @@
-# XML_Checker.py
 import tkinter as tk
 from tkinter import filedialog, messagebox
+from src import gui, xml_validator  # Import the GUI module and the xml_validator
 
-from src import xml_validator  # Import the module with all the functions
-
-# Run the GUI from the xml_validator module
+# Run the GUI
 if __name__ == "__main__":
-    xml_validator.create_gui(tk, filedialog, messagebox)
+    gui.create_gui(xml_validator)  # Pass xml_validator to the GUI function
