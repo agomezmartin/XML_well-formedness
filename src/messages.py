@@ -1,5 +1,3 @@
-# messages.py
-
 # General Messages
 SELECT_DIRECTORY = "Select Directory Containing XML Files"
 SELECT_LOG_DIRECTORY = "Select Directory to Save Log"
@@ -19,3 +17,19 @@ INVALID_XML = "Error: The XML file '{0}' is not well-formed."
 NO_LOG_FILE_SELECTED = "No log file selected. Results not saved."
 NO_XML_FILES = "No XML files found in the selected directory."
 LOG_FILE_ERROR = "Error writing to log file: "
+GUI_TITLE = "XML Validator with Log"  # Title for the GUI window
+
+# Error Messages
+FILE_NOT_FOUND_ERROR = "File not found: {0}"
+PERMISSION_ERROR = "Permission error while accessing the file: {0}"
+XML_PARSE_ERROR = "XML Parsing Error in file '{0}': {1}"
+UNKNOWN_ERROR = "An unknown error occurred: {0}"
+
+# Default file extension for the save dialog
+DEFAULT_FILE_EXTENSION = ".txt"
+
+# File types for the save dialog
+TEXT_FILES = "Text files"
+ALL_FILES = "All files"
+TEXT_FILES_EXTENSION = "*.txt"
+ALL_FILES_EXTENSION = "*.*"
