@@ -1,4 +1,3 @@
-# src/xml_validator.py
 import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -10,7 +9,13 @@ def validate_xml(file_path):
         tree = ET.parse(file_path)
         return True, messages.VALID_XML.format(os.path.basename(file_path))
     except ET.ParseError as e:
-        return False, messages.INVALID_XML.format(os.path.basename(file_path)) + f"\n{messages.PARSE_ERROR.format(e)}"
+        return False, messages.XML_PARSE_ERROR.format(os.path.basename(file_path), str(e))
+    except FileNotFoundError:
+        return False, messages.FILE_NOT_FOUND_ERROR.format(file_path)
+    except PermissionError:
+        return False, messages.PERMISSION_ERROR.format(file_path)
+    except Exception as e:
+        return False, messages.UNKNOWN_ERROR.format(str(e))
 
 # Function to allow the user to select the directory containing XML files
 def select_directory(filedialog):
@@ -21,10 +26,15 @@ def select_directory(filedialog):
 def save_log_path(filedialog):
     log_dir = filedialog.askdirectory(title=messages.SELECT_LOG_DIRECTORY)
     if log_dir:
-        log_filename = filedialog.asksaveasfilename(initialdir=log_dir, defaultextension=".txt", filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
+        log_filename = filedialog.asksaveasfilename(
+            initialdir=log_dir,
+            defaultextension=messages.DEFAULT_FILE_EXTENSION,  # Reference the default extension from messages.py
+            filetypes=[(messages.TEXT_FILES, messages.TEXT_FILES_EXTENSION), # Reference the text files and extension from messages.py
+                      (messages.ALL_FILES, messages.ALL_FILES_EXTENSION)]
+        )
         return log_filename
     return None
-
+    
 # Function to validate all XML files in a given directory and log the results
 def validate_all_xml_files(directory, log_file):
     try:
@@ -51,28 +61,3 @@ def validate_all_xml_files(directory, log_file):
             return messages.LOG_SAVED + log_file
     except Exception as e:
         return messages.LOG_FILE_ERROR + str(e)
-
-# Function to create the main GUI window
-def create_gui(tk, filedialog, messagebox):
-    # Create the main window
-    root = tk.Tk()
-    root.title("XML Validator with Log")
-    root.geometry("300x200")  # Width x Height
-
-    # Add a button to trigger the directory selection and validation
-    validate_button = tk.Button(root, text=messages.SELECT_DIRECTORY, command=lambda: select_directory_action(filedialog, messagebox))
-    validate_button.pack(pady=30)
-
-    # Run the application
-    root.mainloop()
-
-def select_directory_action(filedialog, messagebox):
-    directory = select_directory(filedialog)
-    if directory:
-        log_file = save_log_path(filedialog)
-        if log_file:
-            result = validate_all_xml_files(directory, log_file)
-            if "Results saved to log file" in result:
-                messagebox.showinfo("Log Saved", result)
-            else:
-                messagebox.showwarning("Warning", result)
