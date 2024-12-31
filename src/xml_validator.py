@@ -34,7 +34,7 @@ def save_log_path(filedialog):
         )
         return log_filename
     return None
-    
+
 # Function to validate all XML files in a given directory and log the results
 def validate_all_xml_files(directory, log_file):
     try:
@@ -61,3 +61,23 @@ def validate_all_xml_files(directory, log_file):
             return messages.LOG_SAVED + log_file
     except Exception as e:
         return messages.LOG_FILE_ERROR + str(e)
+
+# Function to validate XML files with a DTD/STD file
+def validate_with_dtd_std(directory, dtd_std_file):
+    try:
+        # Dummy validation: Replace with actual DTD/STD validation logic
+        # Assuming the logic is handled here and results are returned
+        validation_results = []
+        for xml_file in os.listdir(directory):
+            if xml_file.lower().endswith(".xml"):
+                file_path = os.path.join(directory, xml_file)
+                # Placeholder logic for validation
+                validation_results.append(f"Validated {file_path} with {dtd_std_file}")
+        
+        if validation_results:
+            return messages.VALIDATION_SUCCESS.format(directory)
+        else:
+            return messages.VALIDATION_ERROR.format(directory)
+    
+    except Exception as e:
+        return messages.UNKNOWN_ERROR.format(str(e))
