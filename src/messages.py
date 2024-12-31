@@ -1,4 +1,5 @@
 # General Messages
+CHECK_WITH_PARSER = "Check well-formedness"
 SELECT_DIRECTORY = "Select Directory Containing XML Files"
 SELECT_LOG_DIRECTORY = "Select Directory to Save Log"
 NO_XML_FILES_FOUND = "No XML files found in the selected directory."
@@ -33,3 +34,12 @@ TEXT_FILES = "Text files"
 ALL_FILES = "All files"
 TEXT_FILES_EXTENSION = "*.txt"
 ALL_FILES_EXTENSION = "*.*"
+
+# Validation Messages
+SELECT_DTD_STD_FILE = "Select DTD or STD file for validation"
+VALIDATE_WITH_DTD_STD = "Validate XML Files with User-Provided DTD/STD"
+VALIDATION_ERROR = "Validation failed for the XML file '{0}' using the DTD/STD."
+VALIDATION_SUCCESS = "Validation succeeded for the XML file '{0}' using the DTD/STD."
+
+# New Messages for Refactored GUI
+EXIT_BUTTON = "Exit"
