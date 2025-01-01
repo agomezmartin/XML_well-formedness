@@ -24,6 +24,10 @@ GUI_TITLE = "XML Validator with Log"  # Title for the GUI window
 FILE_NOT_FOUND_ERROR = "File not found: {0}"
 PERMISSION_ERROR = "Permission error while accessing the file: {0}"
 XML_PARSE_ERROR = "XML Parsing Error in file '{0}': {1}"
+XML_VALID = "The XML file '{0}' is valid."
+UNKNOWN_ERROR_DTD = "Unknown error"
+XML_INVALID = "The XML file '{0}' is not valid: {1}"
+DTD_PARSE_ERROR = "An error has ocurred during parsing with the DTD: {0}"
 UNKNOWN_ERROR = "An unknown error occurred: {0}"
 
 # Default file extension for the save dialog
