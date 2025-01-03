@@ -27,7 +27,7 @@ XML_PARSE_ERROR = "XML Parsing Error in file '{0}': {1}"
 XML_VALID = "The XML file '{0}' is valid."
 UNKNOWN_ERROR_DTD = "Unknown error"
 XML_INVALID = "The XML file '{0}' is not valid: {1}"
-DTD_PARSE_ERROR = "An error has ocurred during parsing with the DTD: {0}"
+DTD_PARSE_ERROR = "An error has occurred during parsing with the DTD: {0}"
 UNKNOWN_ERROR = "An unknown error occurred: {0}"
 
 # Default file extension for the save dialog
@@ -47,3 +47,9 @@ VALIDATION_SUCCESS = "Validation succeeded for the XML file '{0}' using the DTD/
 
 # New Messages for Refactored GUI
 EXIT_BUTTON = "Exit"
+START_BUTTON = "Start"
+BACK_TO_WELCOME_BUTTON = "Back to Welcome"
+FILE_MENU = "File"
+XML_TASKS_MENU = "XML Tasks"
+CHECK_WELL_FORMEDNESS = "Check well-formedness"
+VALIDATE_WITH_DTD_STD_MENU = "Validate with DTD/STD"
