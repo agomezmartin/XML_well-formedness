@@ -44,6 +44,8 @@ SELECT_DTD_STD_FILE = "Select DTD or STD file for validation"
 VALIDATE_WITH_DTD_STD = "Validate XML Files with User-Provided DTD/STD"
 VALIDATION_ERROR = "Validation failed for the XML file '{0}' using the DTD/STD."
 VALIDATION_SUCCESS = "Validation succeeded for the XML file '{0}' using the DTD/STD."
+VALIDATION_FAILED = "Validation for the XML file '{0}' has failed."
+FILE_PARSE_ERROR = "The following error has ocurred while parsing file '{0}': {1}"
 
 # New Messages for Refactored GUI
 EXIT_BUTTON = "Exit"
