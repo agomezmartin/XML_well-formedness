@@ -1,8 +1,8 @@
-from lxml import etree # etree.DTD is used to load the DTD content.
+from lxml import etree
 import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from . import messages  # Import the messages from the src folder
+from . import messages  # Importing messages from the src folder
 
 # Function to validate XML well-formedness
 def validate_xml(file_path):
@@ -30,7 +30,7 @@ def save_log_path(filedialog):
         log_filename = filedialog.asksaveasfilename(
             initialdir=log_dir,
             defaultextension=messages.DEFAULT_FILE_EXTENSION,  # Reference the default extension from messages.py
-            filetypes=[(messages.TEXT_FILES, messages.TEXT_FILES_EXTENSION), # Reference the text files and extension from messages.py
+            filetypes=[(messages.TEXT_FILES, messages.TEXT_FILES_EXTENSION),  # Reference the text files and extension from messages.py
                       (messages.ALL_FILES, messages.ALL_FILES_EXTENSION)]
         )
         return log_filename
@@ -94,23 +94,14 @@ def validate_with_dtd_std(directory, dtd_std_file):
                     with open(file_path, 'r') as f:
                         xml_tree = etree.parse(f)
 
-                    # Validate against the DTD
+                    # Validate the XML file against the DTD
                     if dtd.validate(xml_tree):
-                        validation_results.append(messages.XML_VALID.format(xml_file))
+                        validation_results.append(messages.VALID_XML.format(xml_file))
                     else:
-                        error_message = dtd.error_log.filter_from_errors()[0] if dtd.error_log.filter_from_errors() else messages.UNKNOWN_ERROR_DTD
-                        validation_results.append(messages.XML_INVALID.format(xml_file, error_message))
+                        validation_results.append(messages.INVALID_XML.format(xml_file, dtd.error_log.filter_from_errors()))
+                except Exception as e:
+                    validation_results.append(messages.FILE_PARSE_ERROR.format(xml_file, str(e)))
 
-                except (etree.XMLSyntaxError, OSError) as e:
-                    validation_results.append(messages.XML_PARSE_ERROR.format(xml_file, str(e)))
-
-        # Generate results message
-        if validation_results:
-            return "\n".join(validation_results)
-        else:
-            return messages.NO_XML_FILES_FOUND
-
-    except (etree.DTDParseError, OSError) as e:
-        return messages.DTD_PARSE_ERROR.format(str(e))
+        return "\n".join(validation_results) if validation_results else messages.NO_XML_FILES_FOUND
     except Exception as e:
-        return messages.UNKNOWN_ERROR.format(str(e))
+        return messages.VALIDATION_FAILED.format(str(e))
