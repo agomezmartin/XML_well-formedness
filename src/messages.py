@@ -72,9 +72,20 @@ TOTAL_PPT_SLIDES = "Total PowerPoint slides: {0}"
 # Message for total PDF pages count
 TOTAL_PDF_PAGES = "Total PDF pages: {0}"
 
-# Message for DTP time
+# Message for logging DTP time
 WORD_DTP_TIME = "DTP Time for Word Documents (hours): {:.2f}"
 PPT_DTP_TIME = "DTP Time for PowerPoint Presentations (hours): {:.2f}"
 PDF_DTP_TIME = "DTP Time for PDF Files (hours): {:.2f}"
 
 TOTAL_DTP_TIME = "Total DTP Time (hours): {:.2f}"
+
+# Message for DTP time menu
+PAGE_SLIDE_COUNTER = "Page/Slide Counter"
+WORD_MINUTES_LABEL = "Minutes per Word page:"
+PPT_MINUTES_LABEL = "Minutes per PowerPoint slide:"
+PDF_MINUTES_LABEL = "Minutes per PDF page:"
+APPLY_BUTTON = "Apply"
+MINUTES_SET_SUCCESS = "Success"
+MINUTES_SET_SUCCESS_MSG = "The minutes per page settings have been successfully applied."
+INVALID_INPUT = "Invalid input"
+INVALID_INPUT_MSG = "Please enter positive integer values for all fields."
