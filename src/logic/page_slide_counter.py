@@ -6,6 +6,30 @@ from .. import messages  # Import messages
 from datetime import datetime
 import math
 
+# Global variables to store minutes per page for each file type
+MINUTES_PER_PAGE_WORD = 5
+MINUTES_PER_PAGE_PPT = 7
+MINUTES_PER_PAGE_PDF = 15
+
+def set_minutes_per_page(word_minutes, ppt_minutes, pdf_minutes):
+    """
+    Set custom minutes per page for each file type (Word, PowerPoint, PDF).
+
+    Args:
+        word_minutes (int): Minutes per Word page.
+        ppt_minutes (int): Minutes per PowerPoint slide.
+        pdf_minutes (int): Minutes per PDF page.
+    """
+    global MINUTES_PER_PAGE_WORD, MINUTES_PER_PAGE_PPT, MINUTES_PER_PAGE_PDF
+
+    if word_minutes > 0:
+        MINUTES_PER_PAGE_WORD = word_minutes
+    if ppt_minutes > 0:
+        MINUTES_PER_PAGE_PPT = ppt_minutes
+    if pdf_minutes > 0:
+        MINUTES_PER_PAGE_PDF = pdf_minutes
+
+
 def count_pages_and_slides_in_directory(directory, log_file):
     """
     Count pages (for Word documents), slides (for PowerPoint presentations),
@@ -83,9 +107,9 @@ def calculate_DTP_time(total_word_pages, total_ppt_slides, total_pdf_pages):
     Returns:
         tuple: DTP time in hours for Word, PowerPoint, and PDF files rounded to the nearest 0.25.
     """
-    word_time = (total_word_pages * 5) / 60  # Word pages time in hours
-    ppt_time = (total_ppt_slides * 7) / 60  # PowerPoint slides time in hours
-    pdf_time = (total_pdf_pages * 15) / 60  # PDF pages time in hours
+    word_time = (total_word_pages * MINUTES_PER_PAGE_WORD) / 60  # Word pages time in hours
+    ppt_time = (total_ppt_slides * MINUTES_PER_PAGE_PPT) / 60  # PowerPoint slides time in hours
+    pdf_time = (total_pdf_pages * MINUTES_PER_PAGE_PDF) / 60  # PDF pages time in hours
 
     # Round up to the nearest 0.25 hour
     word_time = math.ceil(word_time * 4) / 4
