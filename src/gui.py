@@ -130,18 +130,97 @@ def create_gui():
         )
         title_label.pack(pady=(10, 20))
 
-        # Add a button for counting pages/slides
-        count_button = tk.Button(
+        # Add labels and input fields for minutes per page for each file type
+        word_label = tk.Label(
             main_frame,
-            text=messages.START_BUTTON,
+            text=messages.WORD_MINUTES_LABEL,
+            font=("Helvetica", 12),
+            bg="lightgrey",
+            fg="black"
+        )
+        word_label.pack(pady=(10, 0))
+        word_minutes_entry = tk.Entry(
+            main_frame,
+            font=("Helvetica", 12),
+            width=10
+        )
+        word_minutes_entry.pack(pady=(0, 10))
+
+        ppt_label = tk.Label(
+            main_frame,
+            text=messages.PPT_MINUTES_LABEL,
+            font=("Helvetica", 12),
+            bg="lightgrey",
+            fg="black"
+        )
+        ppt_label.pack(pady=(10, 0))
+        ppt_minutes_entry = tk.Entry(
+            main_frame,
+            font=("Helvetica", 12),
+            width=10
+        )
+        ppt_minutes_entry.pack(pady=(0, 10))
+
+        pdf_label = tk.Label(
+            main_frame,
+            text=messages.PDF_MINUTES_LABEL,
+            font=("Helvetica", 12),
+            bg="lightgrey",
+            fg="black"
+        )
+        pdf_label.pack(pady=(10, 0))
+        pdf_minutes_entry = tk.Entry(
+            main_frame,
+            font=("Helvetica", 12),
+            width=10
+        )
+        pdf_minutes_entry.pack(pady=(0, 20))
+
+        # Function to set minutes per page for each file type
+        def set_minutes_per_page(word_minutes, ppt_minutes, pdf_minutes):
+            # Here you can store the values in a dictionary or use them in further processing
+            minutes_dict = {
+                'word': word_minutes,
+                'ppt': ppt_minutes,
+                'pdf': pdf_minutes
+            }
+            # Optionally print or log the values for debugging
+            print("Minutes per page set:", minutes_dict)
+            return minutes_dict
+
+        # Function to apply the entered minutes per page values
+        def apply_minutes():
+            try:
+                word_minutes = int(word_minutes_entry.get())
+                ppt_minutes = int(ppt_minutes_entry.get())
+                pdf_minutes = int(pdf_minutes_entry.get())
+
+                if word_minutes <= 0 or ppt_minutes <= 0 or pdf_minutes <= 0:
+                    raise ValueError
+
+                # Set the minutes per page for each file type
+                minutes_dict = set_minutes_per_page(word_minutes, ppt_minutes, pdf_minutes)
+
+                # Proceed with counting the pages and slides after setting the minutes
+                count_pages_slides_action(filedialog, messagebox, minutes_dict)
+
+                messagebox.showinfo(messages.MINUTES_SET_SUCCESS, messages.MINUTES_SET_SUCCESS_MSG)
+
+            except ValueError:
+                messagebox.showwarning(messages.INVALID_INPUT, messages.INVALID_INPUT_MSG)
+
+        # Add button to apply the minutes per page settings
+        apply_button = tk.Button(
+            main_frame,
+            text=messages.APPLY_BUTTON,
             font=("Helvetica", 14),
-            command=lambda: count_pages_slides_action(filedialog, messagebox),
+            command=apply_minutes,
             width=35,
             bg="white",
             fg="black",
             relief="flat"
         )
-        count_button.pack(pady=10, padx=10)
+        apply_button.pack(pady=10, padx=10)
 
         # Add the reusable back button
         create_back_button().pack(pady=10)
@@ -179,12 +258,14 @@ def create_gui():
             else:
                 messagebox.showwarning(messages.VALIDATION_ERROR, validation_result)
 
-    def count_pages_slides_action(filedialog, messagebox):
+    def count_pages_slides_action(filedialog, messagebox, minutes_dict):
         directory = select_directory(filedialog)
         if directory:
             log_file = save_log_path(filedialog)
             if log_file:
                 result = count_pages_and_slides_in_directory(directory, log_file)
+                # Assuming the function 'count_pages_and_slides_in_directory' can be modified
+                # to accept minutes_dict and use it for calculating durations or logging.
                 if "Results saved to log file" in result:
                     messagebox.showinfo(messages.LOG_SAVED, result)
                 else:
