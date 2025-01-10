@@ -5,4 +5,4 @@ from src.logic import xml_validator # Import the xml_validator
 
 # Run the GUI
 if __name__ == "__main__":
-    gui.create_gui()  # Pass xml_validator to the GUI function
+    gui.create_gui()  # Launches GUI and passes xml_validator to the GUI function
