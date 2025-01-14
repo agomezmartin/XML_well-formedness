@@ -4,6 +4,7 @@ from tkinter.ttk import Frame, Button, Label
 from . import messages
 from .logic.xml_validator import validate_all_xml_files, validate_with_dtd_std, select_directory, save_log_path
 from .logic.page_slide_counter import count_pages_and_slides_in_directory
+from src.config import minutes_dict  # Config with default DTP page/slide times
 
 
 def create_gui():
@@ -178,15 +179,21 @@ def create_gui():
 
         # Function to set minutes per page for each file type
         def set_minutes_per_page(word_minutes, ppt_minutes, pdf_minutes):
-            # Here you can store the values in a dictionary or use them in further processing
-            minutes_dict = {
-                'word': word_minutes,
-                'ppt': ppt_minutes,
-                'pdf': pdf_minutes
-            }
-            # Optionally print or log the values for debugging
-            print("Minutes per page set:", minutes_dict)
-            return minutes_dict
+            """
+            Set custom minutes per page for Word, PowerPoint, and PDF files.
+            This will update the global dictionary `minutes_dict` in config.py.
+
+            Args:
+                word_minutes (int): Minutes per Word page.
+                ppt_minutes (int): Minutes per PowerPoint slide.
+                pdf_minutes (int): Minutes per PDF page.
+            """
+            if word_minutes > 0:
+                minutes_dict['word'] = word_minutes
+            if ppt_minutes > 0:
+                minutes_dict['ppt'] = ppt_minutes
+            if pdf_minutes > 0:
+                minutes_dict['pdf'] = pdf_minutes
 
         # Function to apply the entered minutes per page values
         def apply_minutes():
