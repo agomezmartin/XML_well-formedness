@@ -5,6 +5,7 @@ import PyPDF2
 from .. import messages  # Import messages
 from datetime import datetime
 import math
+from src.config import minutes_dict  # Config with default DTP page/slide times
 
 # Global variables to store minutes per page for each file type
 MINUTES_PER_PAGE_WORD = 5
@@ -68,7 +69,7 @@ def count_pages_and_slides_in_directory(directory, log_file):
                         total_pdf_pages += pdf_pages
 
             # Calculate and log the total DTP time for each file type
-            word_time, ppt_time, pdf_time = calculate_DTP_time(total_word_pages, total_ppt_slides, total_pdf_pages)
+            word_time, ppt_time, pdf_time = calculate_DTP_time(total_word_pages, total_ppt_slides, total_pdf_pages, minutes_dict)
             write_log_totals(log, total_word_pages, total_ppt_slides, total_pdf_pages, word_time, ppt_time, pdf_time)
 
         return messages.LOG_SAVED.format(log_file) if results else messages.NO_MS365_FILES_FOUND
@@ -90,12 +91,14 @@ def write_log_totals(log, total_word_pages, total_ppt_slides, total_pdf_pages, w
     log.write(messages.TOTAL_WORD_PAGES.format(total_word_pages) + "\n")
     log.write(messages.TOTAL_PPT_SLIDES.format(total_ppt_slides) + "\n")
     log.write(messages.TOTAL_PDF_PAGES.format(total_pdf_pages) + "\n")
-    log.write(messages.WORD_DTP_TIME.format(word_time) + "\n")
-    log.write(messages.PPT_DTP_TIME.format(ppt_time) + "\n")
-    log.write(messages.PDF_DTP_TIME.format(pdf_time) + "\n")
+    log.write(messages.WORD_DTP_TIME.format(word_time) + "\n")  # Correctly formatted DTP time
+    log.write(messages.PPT_DTP_TIME.format(ppt_time) + "\n")    # Correctly formatted DTP time
+    log.write(messages.PDF_DTP_TIME.format(pdf_time) + "\n")    # Correctly formatted DTP time
+    total_dtp_time = word_time + ppt_time + pdf_time
+    log.write(messages.TOTAL_DTP_TIME.format(total_dtp_time) + "\n")  # Total DTP time in the log
 
 
-def calculate_DTP_time(total_word_pages, total_ppt_slides, total_pdf_pages):
+def calculate_DTP_time(total_word_pages, total_ppt_slides, total_pdf_pages, minutes_dict):
     """
     Calculate the DTP time for each file type, rounding up to the nearest 0.25 hours.
 
@@ -107,9 +110,21 @@ def calculate_DTP_time(total_word_pages, total_ppt_slides, total_pdf_pages):
     Returns:
         tuple: DTP time in hours for Word, PowerPoint, and PDF files rounded to the nearest 0.25.
     """
-    word_time = (total_word_pages * MINUTES_PER_PAGE_WORD) / 60  # Word pages time in hours
-    ppt_time = (total_ppt_slides * MINUTES_PER_PAGE_PPT) / 60  # PowerPoint slides time in hours
-    pdf_time = (total_pdf_pages * MINUTES_PER_PAGE_PDF) / 60  # PDF pages time in hours
+
+    # Access values from the minutes_dict for each file type
+    word_minutes = minutes_dict.get('word', MINUTES_PER_PAGE_WORD) # Default to Word global constant if user figure not provided
+    ppt_minutes = minutes_dict.get('ppt', MINUTES_PER_PAGE_PPT) # Default to PowerPoint global constant if user figure not provided
+    pdf_minutes = minutes_dict.get('pdf', MINUTES_PER_PAGE_PDF) # Default to PDF global constant if user figure not provided
+
+
+    #word_minutes = minutes_dict['word',MINUTES_PER_PAGE_WORD] # Default to Word global constant if user figure not provided
+    #ppt_minutes = minutes_dict['ppt', MINUTES_PER_PAGE_PPT] # Default to PowerPoint global constant if user figure not provided
+    #pdf_minutes = minutes_dict['pdf', MINUTES_PER_PAGE_PDF] # Default to PDF global constant if user figure not provided
+
+    # Calculate time in hours for each file type based on the number of pages or slides
+    word_time = (total_word_pages * word_minutes) / 60  # Word time in hours
+    ppt_time = (total_ppt_slides * ppt_minutes) / 60  # PowerPoint time in hours
+    pdf_time = (total_pdf_pages * pdf_minutes) / 60  # PDF time in hours
 
     # Round up to the nearest 0.25 hour
     word_time = math.ceil(word_time * 4) / 4
