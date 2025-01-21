@@ -27,13 +27,11 @@ class MainWindow(QMainWindow):
         self.stacked_widget = QStackedWidget(self)
         self.layout.addWidget(self.stacked_widget)
 
-        # Create the home screen widget
+        # Create all feature windows
         self.home_widget = self.create_home_widget()
-
-        # Create the feature windows
-        self.xml_well_formedness_widget = self.create_xml_well_formedness_widget()
-        self.xml_validation_widget = self.create_xml_validation_widget()
-        self.page_slide_counter_widget = self.create_page_slide_counter_widget()
+        self.xml_well_formedness_widget = self.create_feature_widget(self.tr("Checking XML Well-formedness"))
+        self.xml_validation_widget = self.create_feature_widget(self.tr("Validating XML against DTD/STD"))
+        self.page_slide_counter_widget = self.create_feature_widget(self.tr("Counting pages/slides"))
 
         # Add all widgets to the stacked widget
         self.stacked_widget.addWidget(self.home_widget)
@@ -92,8 +90,6 @@ class MainWindow(QMainWindow):
         self.logo_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.logo_label)
 
-        from PySide6.QtGui import QFont
-
         # Add Title
         title_label = QLabel(self.tr("Welcome to DTP & XML Tools"))
         title_label.setAlignment(Qt.AlignCenter)
@@ -110,12 +106,15 @@ class MainWindow(QMainWindow):
         widget.setLayout(layout)
         return widget
 
-    def create_xml_well_formedness_widget(self):
+    def create_feature_widget(self, title_text):
+        """Create a generic feature widget with result area, back home button, and export log button."""
         widget = QWidget()
         layout = QVBoxLayout()
-        self.result_area_well_formedness = QTextEdit(widget)
-        self.result_area_well_formedness.setReadOnly(True)
-        layout.addWidget(self.result_area_well_formedness)
+
+        # Create the result area
+        result_area = QTextEdit(widget)
+        result_area.setReadOnly(True)
+        layout.addWidget(result_area)
 
         # Add Go Back Home Button
         back_home_button = QPushButton(self.tr("Go Back Home"), widget)
@@ -123,52 +122,14 @@ class MainWindow(QMainWindow):
         layout.addWidget(back_home_button)
 
         # Add Export Log Button (Initially Disabled)
-        self.export_log_button_well_formedness = QPushButton(self.tr("Export Log"), widget)
-        self.export_log_button_well_formedness.setEnabled(False)  # Initially disabled
-        self.export_log_button_well_formedness.clicked.connect(lambda: self.export_log(self.result_area_well_formedness.toPlainText()))
-        layout.addWidget(self.export_log_button_well_formedness)
+        export_log_button = QPushButton(self.tr("Export Log"), widget)
+        export_log_button.setEnabled(False)  # Initially disabled
+        export_log_button.clicked.connect(lambda: self.export_log(result_area.toPlainText()))
+        layout.addWidget(export_log_button)
 
-        widget.setLayout(layout)
-        return widget
-
-    def create_xml_validation_widget(self):
-        widget = QWidget()
-        layout = QVBoxLayout()
-        self.result_area_validation = QTextEdit(widget)
-        self.result_area_validation.setReadOnly(True)
-        layout.addWidget(self.result_area_validation)
-
-        # Add Go Back Home Button
-        back_home_button = QPushButton(self.tr("Go Back Home"), widget)
-        back_home_button.clicked.connect(self.go_back_home)
-        layout.addWidget(back_home_button)
-
-        # Add Export Log Button (Initially Disabled)
-        self.export_log_button_validation = QPushButton(self.tr("Export Log"), widget)
-        self.export_log_button_validation.setEnabled(False)  # Initially disabled
-        self.export_log_button_validation.clicked.connect(lambda: self.export_log(self.result_area_validation.toPlainText()))
-        layout.addWidget(self.export_log_button_validation)
-
-        widget.setLayout(layout)
-        return widget
-
-    def create_page_slide_counter_widget(self):
-        widget = QWidget()
-        layout = QVBoxLayout()
-        self.result_area_page_slide = QTextEdit(widget)
-        self.result_area_page_slide.setReadOnly(True)
-        layout.addWidget(self.result_area_page_slide)
-
-        # Add Go Back Home Button
-        back_home_button = QPushButton(self.tr("Go Back Home"), widget)
-        back_home_button.clicked.connect(self.go_back_home)
-        layout.addWidget(back_home_button)
-
-        # Add Export Log Button (Initially Disabled)
-        self.export_log_button_page_slide = QPushButton(self.tr("Export Log"), widget)
-        self.export_log_button_page_slide.setEnabled(False)  # Initially disabled
-        self.export_log_button_page_slide.clicked.connect(lambda: self.export_log(self.result_area_page_slide.toPlainText()))
-        layout.addWidget(self.export_log_button_page_slide)
+        # Store result area and export button for later access
+        widget.result_area = result_area
+        widget.export_log_button = export_log_button
 
         widget.setLayout(layout)
         return widget
@@ -183,8 +144,8 @@ class MainWindow(QMainWindow):
         if not path:
             return
 
-        self.result_area_well_formedness.clear()
-        self.result_area_well_formedness.append(self.tr("Checking XML Well-formedness in: {0}\n").format(path))
+        self.xml_well_formedness_widget.result_area.clear()
+        self.xml_well_formedness_widget.result_area.append(self.tr("Checking XML Well-formedness in: {0}\n").format(path))
 
         for root, _, files in os.walk(path):
             for file in files:
@@ -192,12 +153,12 @@ class MainWindow(QMainWindow):
                     file_path = os.path.join(root, file)
                     well_formed, error = check_well_formedness(file_path)
                     if well_formed:
-                        self.result_area_well_formedness.append(self.tr("{0}: Well-formed").format(file))
+                        self.xml_well_formedness_widget.result_area.append(self.tr("{0}: Well-formed").format(file))
                     else:
-                        self.result_area_well_formedness.append(self.tr("{0}: Not well-formed. Error: {1}").format(file, error))
+                        self.xml_well_formedness_widget.result_area.append(self.tr("{0}: Not well-formed. Error: {1}").format(file, error))
 
         # Enable Export Log Button once there are results
-        self.export_log_button_well_formedness.setEnabled(True)
+        self.xml_well_formedness_widget.export_log_button.setEnabled(True)
 
     def show_xml_validation(self):
         self.stacked_widget.setCurrentWidget(self.xml_validation_widget)
@@ -206,14 +167,14 @@ class MainWindow(QMainWindow):
         if not xml_path or not dtd_path:
             return
 
-        self.result_area_validation.clear()
-        self.result_area_validation.append(self.tr("Validating XML files in: {0} against DTD/STD files in: {1}\n").format(xml_path, dtd_path))
+        self.xml_validation_widget.result_area.clear()
+        self.xml_validation_widget.result_area.append(self.tr("Validating XML files in: {0} against DTD/STD files in: {1}\n").format(xml_path, dtd_path))
 
         # Placeholder for validation logic
-        self.result_area_validation.append(self.tr("Validation feature is under development."))
+        self.xml_validation_widget.result_area.append(self.tr("Validation feature is under development."))
 
         # Enable Export Log Button once there are results
-        self.export_log_button_validation.setEnabled(True)
+        self.xml_validation_widget.export_log_button.setEnabled(True)
 
     def show_page_slide_counter(self):
         self.stacked_widget.setCurrentWidget(self.page_slide_counter_widget)
@@ -221,10 +182,10 @@ class MainWindow(QMainWindow):
         if not path:
             return
 
-        self.result_area_page_slide.clear()
-        self.result_area_page_slide.append("==================================================================")
-        self.result_area_page_slide.append(self.tr("Counting pages/slides in:\n{0}").format(path))
-        self.result_area_page_slide.append("==================================================================")
+        self.page_slide_counter_widget.result_area.clear()
+        self.page_slide_counter_widget.result_area.append("==================================================================")
+        self.page_slide_counter_widget.result_area.append(self.tr("Counting pages/slides in:\n{0}").format(path))
+        self.page_slide_counter_widget.result_area.append("==================================================================")
 
         dtp_time = {
             self.tr("Word"): 5,
@@ -243,38 +204,35 @@ class MainWindow(QMainWindow):
                     if ext in ['doc', 'docx', 'docm']:
                         num_pages = count_pages_docx(file_path)
                         time = (num_pages * dtp_time[self.tr("Word")]) / 60
-                        # Round up time to the nearest 0.25
-                        time = math.ceil(time * 4) / 4  # Multiply by 4, round up, then divide by 4 to get increments of 0.25
+                        time = math.ceil(time * 4) / 4
                         total_time += time
-                        self.result_area_page_slide.append(self.tr("File: '{0}' ({1} pages)\nDTP time: {2:.2f} hours").format(file, num_pages,time))
-                        self.result_area_page_slide.append("------------------------------------------------------------------")
+                        self.page_slide_counter_widget.result_area.append(self.tr("File: '{0}' ({1} pages)\nDTP time: {2:.2f} hours").format(file, num_pages, time))
+                        self.page_slide_counter_widget.result_area.append("------------------------------------------------------------------")
 
                     elif ext in ['ppt', 'pptx', 'ptm']:
                         num_slides = count_slides_pptx(file_path)
                         time = (num_slides * dtp_time[self.tr("PPT")]) / 60
-                        # Round up time to the nearest 0.25
-                        time = math.ceil(time * 4) / 4  # Multiply by 4, round up, then divide by 4 to get increments of 0.25
+                        time = math.ceil(time * 4) / 4
                         total_time += time
-                        self.result_area_page_slide.append(self.tr("File: '{0}' ({1} slides)\nDTP time: {2:.2f} hours").format(file, num_slides, time))
-                        self.result_area_page_slide.append("------------------------------------------------------------------")
+                        self.page_slide_counter_widget.result_area.append(self.tr("File: '{0}' ({1} slides)\nDTP time: {2:.2f} hours").format(file, num_slides, time))
+                        self.page_slide_counter_widget.result_area.append("------------------------------------------------------------------")
 
                     elif ext == 'pdf':
                         num_pages = count_pages_pdf(file_path)
                         pdf_type = self.tr("Editable PDF") if is_editable_pdf(file_path) else self.tr("Not-editable PDF")
                         time = (num_pages * dtp_time[pdf_type]) / 60
-                        # Round up time to the nearest 0.25
-                        time = math.ceil(time * 4) / 4  # Multiply by 4, round up, then divide by 4 to get increments of 0.25
+                        time = math.ceil(time * 4) / 4
                         total_time += time
-                        self.result_area_page_slide.append(self.tr("File: '{0}' ({2}:{1} pages)\nDPT time: {3:.2f} hours").format(file, num_pages, pdf_type, time))
-                        self.result_area_page_slide.append("------------------------------------------------------------------")
+                        self.page_slide_counter_widget.result_area.append(self.tr("File: '{0}' ({2}:{1} pages)\nDPT time: {3:.2f} hours").format(file, num_pages, pdf_type, time))
+                        self.page_slide_counter_widget.result_area.append("------------------------------------------------------------------")
 
                 except Exception as e:
-                    self.result_area_page_slide.append(self.tr("{0}: Error processing file. {1}").format(file, str(e)))
+                    self.page_slide_counter_widget.result_area.append(self.tr("{0}: Error processing file. {1}").format(file, str(e)))
 
-        self.result_area_page_slide.append(self.tr("\nTotal Estimated DTP Time: {0:.2f} hours").format(total_time))
+        self.page_slide_counter_widget.result_area.append(self.tr("\nTotal Estimated DTP Time: {0:.2f} hours").format(total_time))
 
         # Enable Export Log Button once there are results
-        self.export_log_button_page_slide.setEnabled(True)
+        self.page_slide_counter_widget.export_log_button.setEnabled(True)
 
     def export_log(self, log_text):
         """Export log to a .txt file."""
