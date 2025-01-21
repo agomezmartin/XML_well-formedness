@@ -1,8 +1,24 @@
-import tkinter as tk
-from tkinter import filedialog, messagebox
-from src import gui  # Import the GUI module
-from src.logic import xml_validator # Import the xml_validator
+import os
+import sys
+from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QTranslator, QLocale
+from src.ui.main_window import MainWindow
 
-# Run the GUI
+def main():
+    app = QApplication(sys.argv)
+
+    # Load translations
+    translator = QTranslator()
+    locale = QLocale.system().name()
+    translation_path = os.path.join(os.path.dirname(__file__), 'translations', f'{locale}.qm')
+    if os.path.exists(translation_path):
+        translator.load(translation_path)
+        app.installTranslator(translator)
+
+    # Launch Main Window
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
+
 if __name__ == "__main__":
-    gui.create_gui()  # Launches GUI and passes xml_validator to the GUI function
+    main()
