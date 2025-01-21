@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
         self.setGeometry(100, 100, 800, 600)
 
         # Load the logo once to use in both the home screen and menu
-        self.pixmap = QPixmap('.\\src\\img\\logo.png')  # Ensure path is correct
+        self.pixmap = QPixmap('./src/img/logo.png')  # Ensure path is correct
 
         # Main Layout
         self.main_widget = QWidget()
@@ -236,8 +236,11 @@ class MainWindow(QMainWindow):
 
                 except Exception as e:
                     self.page_slide_counter_widget.result_area.append(self.tr("{0}: Error processing file. {1}").format(file, str(e)))
+                    self.page_slide_counter_widget.result_area.append("------------------------------------------------------------------")
 
-        self.page_slide_counter_widget.result_area.append(self.tr("\nTotal Estimated DTP Time: {0:.2f} hours").format(total_time))
+        self.page_slide_counter_widget.result_area.append("==================================================================")
+        self.page_slide_counter_widget.result_area.append(self.tr("Total Estimated DTP Time: {0:.2f} hours").format(total_time))
+        self.page_slide_counter_widget.result_area.append("==================================================================")
 
         # Enable Export Log Button once there are results
         self.page_slide_counter_widget.export_log_button.setEnabled(True)
