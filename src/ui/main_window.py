@@ -1,12 +1,11 @@
 import os
 import math
-from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QTextEdit, QMenuBar, QMenu, QFileDialog, QStackedWidget, QLabel, QPushButton
+from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QTextEdit, QMenuBar, QMenu, QFileDialog, QStackedWidget, QLabel, QPushButton, QLineEdit
 from PySide6.QtGui import QAction, QPixmap, QFont
 from PySide6.QtCore import Qt
 
 from ..logic.xml_tools import check_well_formedness, validate_xml
-from ..logic.DTP_tools import count_pages_docx, count_slides_pptx, count_pages_pdf, is_editable_pdf
-
+from ..logic.DTP_tools import count_pages_docx, count_slides_pptx, count_pages_pdf, is_editable_pdf, calculate_dtp_time
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -127,6 +126,19 @@ class MainWindow(QMainWindow):
         export_log_button.clicked.connect(lambda: self.export_log(result_area.toPlainText()))
         layout.addWidget(export_log_button)
 
+        # Add user input for specific times
+        self.word_time_input = QLineEdit(self)
+        self.word_time_input.setPlaceholderText(self.tr("Word files: Enter DTP time per page. (Optional) (Default value: 5 min/page)"))
+        layout.addWidget(self.word_time_input)
+
+        self.ppt_time_input = QLineEdit(self)
+        self.ppt_time_input.setPlaceholderText(self.tr("Power Point files: Enter DTP time per page. (Optional) (Default value: 7 min/slide)"))
+        layout.addWidget(self.ppt_time_input)
+
+        self.pdf_time_input = QLineEdit(self)
+        self.pdf_time_input.setPlaceholderText(self.tr("Editable PDF files: Enter DTP time per page. (Optional) (Default value: 15 min/page)"))
+        layout.addWidget(self.pdf_time_input)
+
         # Store result area and export button for later access
         widget.result_area = result_area
         widget.export_log_button = export_log_button
@@ -182,17 +194,16 @@ class MainWindow(QMainWindow):
         if not path:
             return
 
+        # Get custom times or default from dtp_time dictionary
+        word_time = self.word_time_input.text() or '5'
+        ppt_time = self.ppt_time_input.text() or '7'
+        pdf_time = self.pdf_time_input.text() or '15'
+        
         self.page_slide_counter_widget.result_area.clear()
         self.page_slide_counter_widget.result_area.append("==================================================================")
         self.page_slide_counter_widget.result_area.append(self.tr("Counting pages/slides in:\n{0}").format(path))
         self.page_slide_counter_widget.result_area.append("==================================================================")
 
-        dtp_time = {
-            self.tr("Word"): 5,
-            self.tr("PPT"): 7,
-            self.tr("Editable PDF"): 15,
-            self.tr("Not-editable PDF"): 30
-        }
         total_time = 0
 
         for root, _, files in os.walk(path):
@@ -203,16 +214,14 @@ class MainWindow(QMainWindow):
                 try:
                     if ext in ['doc', 'docx', 'docm']:
                         num_pages = count_pages_docx(file_path)
-                        time = (num_pages * dtp_time[self.tr("Word")]) / 60
-                        time = math.ceil(time * 4) / 4
+                        time = calculate_dtp_time('word', num_pages, word_time)
                         total_time += time
                         self.page_slide_counter_widget.result_area.append(self.tr("File: '{0}' ({1} pages)\nDTP time: {2:.2f} hours").format(file, num_pages, time))
                         self.page_slide_counter_widget.result_area.append("------------------------------------------------------------------")
 
                     elif ext in ['ppt', 'pptx', 'ptm']:
                         num_slides = count_slides_pptx(file_path)
-                        time = (num_slides * dtp_time[self.tr("PPT")]) / 60
-                        time = math.ceil(time * 4) / 4
+                        time = calculate_dtp_time('ppt', num_slides, ppt_time)
                         total_time += time
                         self.page_slide_counter_widget.result_area.append(self.tr("File: '{0}' ({1} slides)\nDTP time: {2:.2f} hours").format(file, num_slides, time))
                         self.page_slide_counter_widget.result_area.append("------------------------------------------------------------------")
@@ -220,10 +229,9 @@ class MainWindow(QMainWindow):
                     elif ext == 'pdf':
                         num_pages = count_pages_pdf(file_path)
                         pdf_type = self.tr("Editable PDF") if is_editable_pdf(file_path) else self.tr("Not-editable PDF")
-                        time = (num_pages * dtp_time[pdf_type]) / 60
-                        time = math.ceil(time * 4) / 4
+                        time = calculate_dtp_time('pdf', num_pages, pdf_time)
                         total_time += time
-                        self.page_slide_counter_widget.result_area.append(self.tr("File: '{0}' ({2}:{1} pages)\nDPT time: {3:.2f} hours").format(file, num_pages, pdf_type, time))
+                        self.page_slide_counter_widget.result_area.append(self.tr("File: '{0}' ({2}:{1} pages)\nDTP time: {3:.2f} hours").format(file, num_pages, pdf_type, time))
                         self.page_slide_counter_widget.result_area.append("------------------------------------------------------------------")
 
                 except Exception as e:
@@ -240,3 +248,4 @@ class MainWindow(QMainWindow):
         if file_path:
             with open(file_path, 'w') as file:
                 file.write(log_text)
+
