@@ -1,11 +1,12 @@
 import os
 import math
 from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QTextEdit, QMenuBar, QMenu, QFileDialog, QStackedWidget, QLabel, QPushButton
-from PySide6.QtGui import QAction, QPixmap,QFont
+from PySide6.QtGui import QAction, QPixmap, QFont
 from PySide6.QtCore import Qt
 
 from ..logic.xml_tools import check_well_formedness, validate_xml
 from ..logic.DTP_tools import count_pages_docx, count_slides_pptx, count_pages_pdf, is_editable_pdf
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -121,6 +122,12 @@ class MainWindow(QMainWindow):
         back_home_button.clicked.connect(self.go_back_home)
         layout.addWidget(back_home_button)
 
+        # Add Export Log Button (Initially Disabled)
+        self.export_log_button_well_formedness = QPushButton(self.tr("Export Log"), widget)
+        self.export_log_button_well_formedness.setEnabled(False)  # Initially disabled
+        self.export_log_button_well_formedness.clicked.connect(lambda: self.export_log(self.result_area_well_formedness.toPlainText()))
+        layout.addWidget(self.export_log_button_well_formedness)
+
         widget.setLayout(layout)
         return widget
 
@@ -136,6 +143,12 @@ class MainWindow(QMainWindow):
         back_home_button.clicked.connect(self.go_back_home)
         layout.addWidget(back_home_button)
 
+        # Add Export Log Button (Initially Disabled)
+        self.export_log_button_validation = QPushButton(self.tr("Export Log"), widget)
+        self.export_log_button_validation.setEnabled(False)  # Initially disabled
+        self.export_log_button_validation.clicked.connect(lambda: self.export_log(self.result_area_validation.toPlainText()))
+        layout.addWidget(self.export_log_button_validation)
+
         widget.setLayout(layout)
         return widget
 
@@ -150,6 +163,12 @@ class MainWindow(QMainWindow):
         back_home_button = QPushButton(self.tr("Go Back Home"), widget)
         back_home_button.clicked.connect(self.go_back_home)
         layout.addWidget(back_home_button)
+
+        # Add Export Log Button (Initially Disabled)
+        self.export_log_button_page_slide = QPushButton(self.tr("Export Log"), widget)
+        self.export_log_button_page_slide.setEnabled(False)  # Initially disabled
+        self.export_log_button_page_slide.clicked.connect(lambda: self.export_log(self.result_area_page_slide.toPlainText()))
+        layout.addWidget(self.export_log_button_page_slide)
 
         widget.setLayout(layout)
         return widget
@@ -177,6 +196,9 @@ class MainWindow(QMainWindow):
                     else:
                         self.result_area_well_formedness.append(self.tr("{0}: Not well-formed. Error: {1}").format(file, error))
 
+        # Enable Export Log Button once there are results
+        self.export_log_button_well_formedness.setEnabled(True)
+
     def show_xml_validation(self):
         self.stacked_widget.setCurrentWidget(self.xml_validation_widget)
         xml_path = QFileDialog.getExistingDirectory(self, self.tr("Select XML Directory"))
@@ -190,6 +212,9 @@ class MainWindow(QMainWindow):
         # Placeholder for validation logic
         self.result_area_validation.append(self.tr("Validation feature is under development."))
 
+        # Enable Export Log Button once there are results
+        self.export_log_button_validation.setEnabled(True)
+
     def show_page_slide_counter(self):
         self.stacked_widget.setCurrentWidget(self.page_slide_counter_widget)
         path = QFileDialog.getExistingDirectory(self, self.tr("Select Directory"))
@@ -198,7 +223,7 @@ class MainWindow(QMainWindow):
 
         self.result_area_page_slide.clear()
         self.result_area_page_slide.append("==================================================================")
-        self.result_area_page_slide.append(self.tr("Counting pages/slides in: {0}").format(path))
+        self.result_area_page_slide.append(self.tr("Counting pages/slides in:\n{0}").format(path))
         self.result_area_page_slide.append("==================================================================")
 
         dtp_time = {
@@ -247,3 +272,13 @@ class MainWindow(QMainWindow):
                     self.result_area_page_slide.append(self.tr("{0}: Error processing file. {1}").format(file, str(e)))
 
         self.result_area_page_slide.append(self.tr("\nTotal Estimated DTP Time: {0:.2f} hours").format(total_time))
+
+        # Enable Export Log Button once there are results
+        self.export_log_button_page_slide.setEnabled(True)
+
+    def export_log(self, log_text):
+        """Export log to a .txt file."""
+        file_path, _ = QFileDialog.getSaveFileName(self, self.tr("Save Log"), "", self.tr("Text Files (*.txt)"))
+        if file_path:
+            with open(file_path, 'w') as file:
+                file.write(log_text)
