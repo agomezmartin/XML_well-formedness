@@ -2,10 +2,40 @@ import math
 from docx import Document
 from pptx import Presentation
 import fitz  # PyMuPDF for PDFs
+import win32com.client  # Required for handling .doc files on Windows
 
 def count_pages_docx(file_path):
+    # Check if it's a .doc file
+    if file_path.lower().endswith('.doc'):
+        return count_pages_doc(file_path)
+    elif file_path.lower().endswith('.docx') or file_path.lower().endswith('.docm'):
+        return count_pages_docx_with_docx(file_path)
+    else:
+        raise ValueError(self.tr(f"Unsupported file type: {file_path}"))
+
+def count_pages_doc(file_path):
+    """Count pages in .doc file using pywin32."""
+    # Initialize COM object for Word
+    word = win32com.client.Dispatch("Word.Application")
+    word.Visible = False  # Word is not shown during the process
+
+    # Open the document
+    doc = word.Documents.Open(file_path)
+
+    # Get the number of pages
+    page_count = doc.ComputeStatistics(2)  # 2 corresponds to wdStatisticPages
+
+    # Close the document and quit Word
+    doc.Close(False)
+    word.Quit()
+
+    return page_count
+
+def count_pages_docx_with_docx(file_path):
+    """Count pages in .docx or .docm file."""
     doc = Document(file_path)
     return len(doc.paragraphs)
+
 
 def count_slides_pptx(file_path):
     ppt = Presentation(file_path)
