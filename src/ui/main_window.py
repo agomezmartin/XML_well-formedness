@@ -105,7 +105,7 @@ class MainWindow(QMainWindow):
         widget.setLayout(layout)
         return widget
 
-    def create_feature_widget(self, title_text):
+    def create_feature_widget(self, title_text, is_dtp=False):
         """Create a generic feature widget with result area, back home button, and export log button."""
         widget = QWidget()
         layout = QVBoxLayout()
@@ -125,20 +125,26 @@ class MainWindow(QMainWindow):
         back_home_button = QPushButton(self.tr("Go Back Home"), widget)
         back_home_button.clicked.connect(self.go_back_home)
         layout.addWidget(back_home_button)
+        
+        if title_text=="Counting pages/slides":
+            is_dtp=True
 
+        # Add DTP-specific inputs if needed
+        if is_dtp:
+            self.word_time_input = QLineEdit(self)
+            self.word_time_input.setPlaceholderText(self.tr("Word files: Enter DTP time per page. (Optional) (Default value: 5 min/page)"))
+            layout.addWidget(self.word_time_input)
 
-        # Add user input for specific times
-        self.word_time_input = QLineEdit(self)
-        self.word_time_input.setPlaceholderText(self.tr("Word files: Enter DTP time per page. (Optional) (Default value: 5 min/page)"))
-        layout.addWidget(self.word_time_input)
+            self.ppt_time_input = QLineEdit(self)
+            self.ppt_time_input.setPlaceholderText(self.tr("Power Point files: Enter DTP time per page. (Optional) (Default value: 7 min/slide)"))
+            layout.addWidget(self.ppt_time_input)
 
-        self.ppt_time_input = QLineEdit(self)
-        self.ppt_time_input.setPlaceholderText(self.tr("Power Point files: Enter DTP time per page. (Optional) (Default value: 7 min/slide)"))
-        layout.addWidget(self.ppt_time_input)
+            self.pdf_time_input = QLineEdit(self)
+            self.pdf_time_input.setPlaceholderText(self.tr("Editable PDF files: Enter DTP time per page. (Optional) (Default value: 15 min/page)"))
+            layout.addWidget(self.pdf_time_input)
 
-        self.pdf_time_input = QLineEdit(self)
-        self.pdf_time_input.setPlaceholderText(self.tr("Editable PDF files: Enter DTP time per page. (Optional) (Default value: 15 min/page)"))
-        layout.addWidget(self.pdf_time_input)
+            # Track DTP-specific widgets for visibility control
+            widget.dtp_inputs = [self.word_time_input, self.ppt_time_input, self.pdf_time_input]
 
         # Store result area and export button for later access
         widget.result_area = result_area
@@ -146,6 +152,8 @@ class MainWindow(QMainWindow):
 
         widget.setLayout(layout)
         return widget
+
+
 
     def go_back_home(self):
         """Switch to the home screen."""
