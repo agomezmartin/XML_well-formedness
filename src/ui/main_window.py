@@ -115,16 +115,17 @@ class MainWindow(QMainWindow):
         result_area.setReadOnly(True)
         layout.addWidget(result_area)
 
-        # Add Go Back Home Button
-        back_home_button = QPushButton(self.tr("Go Back Home"), widget)
-        back_home_button.clicked.connect(self.go_back_home)
-        layout.addWidget(back_home_button)
-
         # Add Export Log Button (Initially Disabled)
         export_log_button = QPushButton(self.tr("Export Log"), widget)
         export_log_button.setEnabled(False)  # Initially disabled
         export_log_button.clicked.connect(lambda: self.export_log(result_area.toPlainText()))
         layout.addWidget(export_log_button)
+
+        # Add Go Back Home Button
+        back_home_button = QPushButton(self.tr("Go Back Home"), widget)
+        back_home_button.clicked.connect(self.go_back_home)
+        layout.addWidget(back_home_button)
+
 
         # Add user input for specific times
         self.word_time_input = QLineEdit(self)
@@ -200,15 +201,19 @@ class MainWindow(QMainWindow):
         pdf_time = self.pdf_time_input.text() or '15'
         
         self.page_slide_counter_widget.result_area.clear()
-        self.page_slide_counter_widget.result_area.append("==================================================================")
+        self.page_slide_counter_widget.result_area.append("=======================================")
         self.page_slide_counter_widget.result_area.append(self.tr("Counting pages/slides in:\n{0}").format(path))
-        self.page_slide_counter_widget.result_area.append("==================================================================")
+        self.page_slide_counter_widget.result_area.append("=======================================")
 
         total_time = 0
 
         for root, _, files in os.walk(path):
             for file in files:
                 file_path = os.path.join(root, file)
+                
+                # Ensure the file path is correctly quoted for any downstream operations
+                # file_path = f'"{file_path}"'
+                # ext = file.lower().rsplit('.', 1)[-1]  # Safer split for extensions with dot in name
                 ext = file.lower().split('.')[-1]
 
                 try:
@@ -233,14 +238,18 @@ class MainWindow(QMainWindow):
                         total_time += time
                         self.page_slide_counter_widget.result_area.append(self.tr("File: '{0}' ({2}:{1} pages)\nDTP time: {3:.2f} hours").format(file, num_pages, pdf_type, time))
                         self.page_slide_counter_widget.result_area.append("------------------------------------------------------------------")
-
+                
                 except Exception as e:
-                    self.page_slide_counter_widget.result_area.append(self.tr("{0}: Error processing file. {1}").format(file, str(e)))
-                    self.page_slide_counter_widget.result_area.append("------------------------------------------------------------------")
+                     self.page_slide_counter_widget.result_area.append(self.tr("ERROR on file '{0}'.\nRename the file without white spaces and run the program again.").format(file))
+                     self.page_slide_counter_widget.result_area.append("<><><><><><><><><><><><><><><><><><><><>")
 
-        self.page_slide_counter_widget.result_area.append("==================================================================")
+#                 except Exception as e:
+#                     self.page_slide_counter_widget.result_area.append(self.tr("{0}: Error processing file. {1}").format(file, str(e)))
+#                     self.page_slide_counter_widget.result_area.append("------------------------------------------------------------------")
+
+        self.page_slide_counter_widget.result_area.append("=======================================")
         self.page_slide_counter_widget.result_area.append(self.tr("Total Estimated DTP Time: {0:.2f} hours").format(total_time))
-        self.page_slide_counter_widget.result_area.append("==================================================================")
+        self.page_slide_counter_widget.result_area.append("=======================================")
 
         # Enable Export Log Button once there are results
         self.page_slide_counter_widget.export_log_button.setEnabled(True)
