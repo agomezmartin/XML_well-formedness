@@ -214,7 +214,7 @@ class MainWindow(QMainWindow):
         
         self.page_slide_counter_widget.result_area.clear()
         self.page_slide_counter_widget.result_area.append("=======================================")
-        self.page_slide_counter_widget.result_area.append(self.tr("Counting pages/slides in:\n{0}").format(path))
+        self.page_slide_counter_widget.result_area.append(self.tr("DTP estimates for files in:\n{0}").format(path))
         self.page_slide_counter_widget.result_area.append("=======================================")
 
         total_time = 0
