@@ -158,7 +158,9 @@ class MainWindow(QMainWindow):
             return
 
         self.xml_well_formedness_widget.result_area.clear()
-        self.xml_well_formedness_widget.result_area.append(self.tr("Checking XML Well-formedness in: {0}\n").format(path))
+        self.xml_well_formedness_widget.result_area.append("=======================================")
+        self.xml_well_formedness_widget.result_area.append(self.tr("Checking XML Well-formedness in:\n{0}").format(path))
+        self.xml_well_formedness_widget.result_area.append("=======================================")
 
         for root, _, files in os.walk(path):
             for file in files:
@@ -167,8 +169,10 @@ class MainWindow(QMainWindow):
                     well_formed, error = check_well_formedness(file_path)
                     if well_formed:
                         self.xml_well_formedness_widget.result_area.append(self.tr("{0}: Well-formed").format(file))
+                        self.xml_well_formedness_widget.result_area.append("------------------------------------------------------------------")
                     else:
                         self.xml_well_formedness_widget.result_area.append(self.tr("{0}: Not well-formed. Error: {1}").format(file, error))
+                        self.xml_well_formedness_widget.result_area.append("------------------------------------------------------------------")
 
         # Enable Export Log Button once there are results
         self.xml_well_formedness_widget.export_log_button.setEnabled(True)
